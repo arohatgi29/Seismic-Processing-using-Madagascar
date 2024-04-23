@@ -41,7 +41,7 @@ graph TD;
 
 ```
 ### Fetch the Seismic data
-As mentionned before at the beginning of thes notes, our data is in SEGY format and need to be converted to SU format. This is done via:
+
 ```Shell
 tgz = '2D_Land_data_2ms.tgz'
 Fetch(tgz,'freeusp')
@@ -50,15 +50,22 @@ files = ['Line_001.'+x for x in Split('TXT SPS RPS XPS sgy')]
 Flow(files,tgz,
      'gunzip -c $SOURCE | tar -xvf -',stdin=0,stdout=-1)
 ```
-In addition to conversion the code above removes the Auxilliary channels,using key `trid` and `min=1`\
+### Convert sgy to rsf format
 
-trid: Trace identification\
--1 = Aux data\
-1 = Seismic data\
-
-We may use **`surange`** to see if the header settings are correct as shown below:
 ```Shell
-surange < data.su
+Flow('line tline','Line_001.sgy','segyread tfile=${TARGETS[1]}')
+
+Result('first','line',
+       '''
+       window n2=1000 |
+       agc rect1=250 rect2=100 |
+       grey title="First 1000 traces"
+       ''')
+```
+
+Use **`sfheaderattr`** to check the header file:
+```Shell
+< tline.rsf sfheaderattr
 ```
 <img src="https://user-images.githubusercontent.com/124686555/234352239-7417ed65-2d3a-45f2-b294-3b718d3454d6.png" width="700" height="500">
 
