@@ -135,20 +135,22 @@ savefig("geometry.png")
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/geometry.png" width="700">
 
-Before proceeding to the geometry, we need to convert the geometry information from the text file into a binary format, then load the binary information into data to apply the geometry.
+### Update the headers to have sourece, receiver coordinates and offset
 
 ```Shell
-a2b < geometry.txt n1=9 > myheaders.bin
-```
-n1=9 indicates number of columns in the geometry text file. After appying the geometry we can notice that headers are correctly updated including the offset and X 1 Y coordinates.
+# Arrange receiver coordinates 
+shots = []
+for shot in range(lines['S']):
+    line = 'line%d' % shot
+    Flow(line,'R','window f2=%d n2=282' % (2*shot))
+    shots.append(line)
+Flow('rece',shots,'cat axis=3 ${SOURCES[1:%d]}' % len(shots))
+Flow('sour','S','spray axis=2 n=282 o=0 d=1')
 
-![surange_after_geom](https://user-images.githubusercontent.com/124686555/234369239-5789a888-ba74-4da9-87cf-50555bc8823d.png)
+# update the headers
 
-### Viewing shot gathers QC
 
-```Shell
-suwind key=ep min=100 max=100 < data_geom2.su | suximage key=offset cmap=hsv4 perc=90\
-                title="shot100 after geometry" label1="Time(s)" label2="Offsset(m)"  &
+
 ```
 <img src="https://user-images.githubusercontent.com/124686555/234378605-c5f9ecbd-3bc4-4eb0-a441-a1bebe0e785f.png" width="700">
 
