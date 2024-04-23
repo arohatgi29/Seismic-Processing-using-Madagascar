@@ -76,7 +76,7 @@ As an example, the code below run a display in wiggles for one shot gather `shot
 suwind key=fldr min=231 max=231 < seismic.su | suximage perc=99 &
 ```
 
-<img src="https://user-images.githubusercontent.com/124686555/234355282-6d04788f-ac47-47b7-8a4b-7281738021de.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png" width="700">
 
 ### Setting geometry
 Geometry definition is one of the most time consuming in processing especially for 2D data. This process is for converting the observed field parameters recorded in observer logs into trace headers.
