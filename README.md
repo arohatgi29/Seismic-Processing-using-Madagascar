@@ -75,6 +75,9 @@ Result('first',
 ```
 Use **`scons first.view`** to view first 1000 traces
 
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000.png" width="700">
+
+
 #### Apply Automatic Gain control for better visualization
 Use **`sfagc`** to apply agc to windowed traces:
 ```Shell
