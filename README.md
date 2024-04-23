@@ -40,10 +40,15 @@ graph TD;
     N-->O(Migration)
 
 ```
-### Reading and viewing seismic data
+### Fetch the Seismic data
 As mentionned before at the beginning of thes notes, our data is in SEGY format and need to be converted to SU format. This is done via:
 ```Shell
-segyread tape=Line_001.sgy endian=0 |suwind key="trid" min="1" > data.su
+tgz = '2D_Land_data_2ms.tgz'
+Fetch(tgz,'freeusp')
+
+files = ['Line_001.'+x for x in Split('TXT SPS RPS XPS sgy')]
+Flow(files,tgz,
+     'gunzip -c $SOURCE | tar -xvf -',stdin=0,stdout=-1)
 ```
 In addition to conversion the code above removes the Auxilliary channels,using key `trid` and `min=1`\
 
