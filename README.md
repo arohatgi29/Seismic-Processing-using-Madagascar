@@ -1,9 +1,5 @@
 # Seismic-Processing-using-Madagascar
 # Table of contents
-* [How to install Seismic Unix on Windows](#how-to-install-seismic-unix-on-windows)
-* [Ubuntu on Windows](#ubuntu-on-windows)
-* [Installing Xming Server](#installing-xming-server)
-* [Installing Seismic Unix](#installing-seismic-unix)
 * [Seismic processing of 2D line](#seismic-processing-of-2D-line)
   * [Reading and viewing seismic data](#reading-and-viewing-seismic-data)
   * [Setting geometry](#setting-geometry)
@@ -20,72 +16,6 @@
  
 
 
-## How to install Seismic Unix on Windows
-This tutorial will illustrate step by step on how to process seismic data using Seismic Unix. Before starting our Seismic Data Processing journey, some installations need to be made. We will go through all**
-## Ubuntu on Windows
-
-The perfect thing to do is to install a Linux partition in your machine (laptop or desktop). In my case I installed Ubuntu [WSL](https://ubuntu.com/wsl) which is a complete Ubuntu terminal environment in on Windows, which is called Windows Subsystem for Linux (WSL)
-
-## Installing Xming Server
-In order to run SU modules, an X window server will be needed. in our case I used Xming, which need to be launched after installing Seismic Unix. Here is the [Xming server website for download](http://www.straightrunning.com/XmingNotes/)
-
-## Installing Seismic Unix
-Before installing SU, we need to set some environment variables. Add following commands to your profile like .zshrc or .bashrc.
-
-```Shell
-export CWPROOT=$HOME
-```
-```Shell
-export PATH=$PATH:$HOME/bin
-```
-Get SU files from [Seismic-unix.org](https://wiki.seismic-unix.org/doku.php). Here we download the latest version of SU cwp_su_all_44R23.tgz.
-
-Copy the file to $HOME and unzip it by:
-
-```Shell
-mv /mnt/c/Users/lzhao/Downloads/cwp_su_all_44R26.tgz ~
-```
-```Shell
-tar xvf cwp_su_all_44R26.tgz
-```
-After extracting the folder of SU a correction need to be made to the config file:
-```Shell
-cd src
-```
-```Shell 
-mv Makefile.config Makefile.config.old
-```
-```Shell
-cp ./configs/Makefile.config_Linux_x86_64 ./Makefile.config
-```
-Installing some packages necessary for Seismic Unix.
-
-```Shell
-sudo apt install build-essential
-```
-
-```Shell
-sudo apt install gfortran
-sudo apt install libx11-dev
-sudo apt install libxt-dev
-sudo apt install freeglut3-dev
-sudo apt install libxmu-dev libxi-dev
-sudo apt install libc6
-sudo apt install libuil4
-sudo apt install x11proto-print-dev
-sudo apt install libmotif-dev
-```
-Finally we will install Seismic Unix:
-```Shell
-make install make xtinstall
-make finstall
-```
-Seismic Unix Should be installed successfully without errors, please ignore the warning messages.
-In order to check run the command below:
-```Shell
-suplane | suximage title="test"
-```
-**CONGRATULATIONS ON YOUR FIRST SEISMIC UNIX DISPLAY!!!** :satisfied:
 ## Seismic processing of 2D line
 For this tutorial we are going to explain step by step on how to process 2D seismic data using Seismic Unix. The data for this document can be accessed for free [here!](https://dataunderground.org/dataset/poland-vibroseis/resource/96dfd0be-61c8-4edb-9d04-c7d2aeb16d27).
 Below is the proposed processing flow chart that we will follow.
