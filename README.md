@@ -151,6 +151,8 @@ Flow('sour','S','spray axis=2 n=282 o=0 d=1')
 # update the headers
 
 ```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Presentation3.gif" width="700">
+
 
 ### Compute statics
 
