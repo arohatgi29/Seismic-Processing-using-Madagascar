@@ -57,11 +57,11 @@ Flow('line tline','Line_001.sgy','segyread tfile=${TARGETS[1]}')
 
 ```
 
-Use **`sfheaderattr`** to check the header file:
+Use **`sfheaderattr`** in terminal to check the header file:
 ```Shell
 < tline.rsf sfheaderattr
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png" width="700" width="700" height="500>
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png" width="700">
 
 #### Windowing and viewing data
 As an example, the code below run a display in wiggles for one shot gather `shot gather FFID#231`. It is always a good idea to look at some small part of the data to check if data exists. 
@@ -74,6 +74,7 @@ Result('first','line',
        ''')
 ```
 Use **`scons first.view`** to view first 1000 traces
+
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png" width="700">
 
 ### Setting geometry
