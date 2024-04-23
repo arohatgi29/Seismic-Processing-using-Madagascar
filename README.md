@@ -135,6 +135,7 @@ savefig("geometry.png")
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/geometry.png" width="700">
 
+
 ### Update the headers to have sourece, receiver coordinates and offset
 
 ```Shell
@@ -149,9 +150,38 @@ Flow('sour','S','spray axis=2 n=282 o=0 d=1')
 
 # update the headers
 
-
-
 ```
+
+### Compute statics
+
+```Shell
+# Arrange receiver coordinates 
+shots = []
+for shot in range(lines['S']):
+    line = 'line%d' % shot
+    Flow(line,'R','window f2=%d n2=282' % (2*shot))
+    shots.append(line)
+Flow('rece',shots,'cat axis=3 ${SOURCES[1:%d]}' % len(shots))
+Flow('sour','S','spray axis=2 n=282 o=0 d=1')
+
+# update the headers
+```
+
+### Map to regulat Geometry
+
+Use **`sfintbin`** to take input a 2-D trace file and uses trace headers to arrange input traces in a 3-D cube
+
+```Shell
+Flow('lines','line',
+     '''
+     intbin xk=cdpt yk=fldr | window f2=2 |
+     put
+     label3=Source d3=0.05  o3=688  unit3=km
+     label2=Offset d2=0.025 o2=-3.5 unit2=km
+     label1=Time unit1=s
+     ''')
+```
+
 <img src="https://user-images.githubusercontent.com/124686555/234378605-c5f9ecbd-3bc4-4eb0-a441-a1bebe0e785f.png" width="700">
 
 Another QC we can look at the source and receiver locations, first thing to do is to create the binary files that contain the coordinates information (X and Y) for both source and receiver.
