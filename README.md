@@ -67,15 +67,27 @@ Use **`sfheaderattr`** in terminal to check the header file:
 As an example, the code below run a display in wiggles for one shot gather `shot gather FFID#231`. It is always a good idea to look at some small part of the data to check if data exists. 
 Use **`sfwindow`** to check first 1000 traces:
 ```Shell
-Result('first','line',
+Flow('first','line','window n2=1000' )
+Result('first',
        '''
-       window n2=1000 |
        grey title="First 1000 traces"
        ''')
 ```
 Use **`scons first.view`** to view first 1000 traces
 
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png" width="700">
+#### Apply Automatic Gain control for better visualization
+Use **`sfagc`** to apply agc to windowed traces:
+```Shell
+
+Flow('firstagc','first','agc rect1= 20 rect2=50')
+Result('firstagc',
+       '''
+       grey title="First 1000 traces after Automatic Gain Control"
+       ''')
+```
+Use **`scons firstagc.view`** to view first 1000 traces
+
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000_agc.png" width="700">
 
 ### Setting geometry
 Geometry definition is one of the most time consuming in processing especially for 2D data. This process is for converting the observed field parameters recorded in observer logs into trace headers.
