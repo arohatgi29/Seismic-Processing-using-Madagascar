@@ -79,7 +79,7 @@ Use **`scons first.view`** to view first 1000 traces
 
 
 #### Apply Automatic Gain control for better visualization
-Use **`sfagc`** to apply agc to windowed traces:
+Use **`sfagc`** to apply agc to windowed traces. The smoothing is controlled by rect#= and repeat= parameters
 ```Shell
 
 Flow('firstagc','first','agc rect1= 20 rect2=50')
