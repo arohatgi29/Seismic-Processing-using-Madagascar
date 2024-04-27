@@ -119,7 +119,7 @@ cat Line_001.SRPS | awk '{print $9}'
 ```
 I worked on another Python script which uses the SPS information as input and outputs a text file containig the geometry information (the X, Y coordinates for source and receiver, the offset, and the static information.
 
-### Python code for geometry headers update
+### Julia code to plot the source and treceiver coordinates
 Below is the code to run in a Python environment.
 
 ```Julia
@@ -187,6 +187,17 @@ Use **`sfheaderattr`** in terminal to check the header file:
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/New_headers.png">
 
 
+###  Visualize regular geometry
+```Shell
+Result('line_0',
+       '''
+       transp memsize=1000 plane=23 |
+       byte gainpanel=each |
+       grey3 frame1=500 frame2=100 frame3=120 flat=n movie=2
+       title="Raw Data"
+       ''')
+```
+Use **`line_0.view`** to see the results
 ![Alt Text](https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Presentation4.gif)
 
 
