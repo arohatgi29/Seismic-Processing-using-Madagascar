@@ -119,8 +119,6 @@ cat Line_001.SRPS | awk '{print $9}'
 ```
 I worked on another Python script which uses the SPS information as input and outputs a text file containig the geometry information (the X, Y coordinates for source and receiver, the offset, and the static information.
 
-
-
 ### Python code for geometry headers update
 Below is the code to run in a Python environment.
 
@@ -147,6 +145,7 @@ savefig("geometry.png")
 
 ```Shell
 # Arrange receiver coordinates 
+lines = {'S':251,'R':782}
 shots = []
 for shot in range(lines['S']):
     line = 'line%d' % shot
@@ -155,9 +154,39 @@ for shot in range(lines['S']):
 Flow('rece',shots,'cat axis=3 ${SOURCES[1:%d]}' % len(shots))
 Flow('sour','S','spray axis=2 n=282 o=0 d=1')
 
-# update the headers
+# convert line in same dimension as sour and rece
 
+Flow('line_0','line','intbin xk=cdpt yk=fldr | window f2=2' )
+Flow('tline_0','tline','intbin xk=cdpt yk=fldr head=$SOURCE | window f2=2 ')
+
+# Separate Sx, Sy, Rx, and Ry
+Flow('sourx','sour','window n1=1 |  scale dscale=0.001')
+Flow('soury','sour','window f1=1 |  scale dscale=0.001')
+Flow('recex','rece','window n1=1 |  scale dscale=0.001')
+Flow('recey','rece','window f1=1 |  scale dscale=0.001')
+
+# Calculate the offset
+Flow('offset','sourx soury recex recey',
+     '''
+     math SX=${SOURCES[0]} SY=${SOURCES[1]}
+     RX=${SOURCES[2]} RY=${SOURCES[3]}
+     output="sqrt((RX-SX)^2+(RY-SY)^2)"
+     ''')
+
+# change to integers to edit the headers
+Flow('sx', 'sourx', 'dd type=int')
+Flow('sy', 'soury', 'dd type=int')
+Flow('rx', 'recex', 'dd type=int')
+Flow('ry', 'recey', 'dd type=int')
+Flow('o', 'offset', 'dd type=int')
+
+Flow('header_new','line_0 tline_0 sx sy rx ry o',
+     'segyheader tfile=${SOURCES[1]} sx=${SOURCES[2]} sy=${SOURCES[3]} gx=${SOURCES[4]} gy=${SOURCES[5]} offset=${SOURCES[6]}')
 ```
+Use **`sfheaderattr`** in terminal to check the header file:
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/New_headers.png">
+
+
 ![Alt Text](https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Presentation4.gif)
 
 
