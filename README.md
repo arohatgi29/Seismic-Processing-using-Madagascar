@@ -184,7 +184,7 @@ Flow('header_new','line_0 tline_0 sx sy rx ry o',
      'segyheader tfile=${SOURCES[1]} sx=${SOURCES[2]} sy=${SOURCES[3]} gx=${SOURCES[4]} gy=${SOURCES[5]} offset=${SOURCES[6]}')
 ```
 Use **`sfheaderattr`** in terminal to check the header file:
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/New_headers.png">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/New_headers.png" width="700">
 
 
 ###  Visualize regular geometry
