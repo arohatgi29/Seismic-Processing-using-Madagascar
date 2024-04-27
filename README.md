@@ -93,7 +93,14 @@ Use **`scons firstagc.view`** to view first 1000 traces
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000_agc.png" width="700">
 
 ### Setting geometry
+The data we have: We've received seismic data along with four ASCII files:
+Line_001.TXT: It contains information about the spacing between the source and receiver, numbering of shot points and receiver stations, reference velocity, reference level, and some other information.
+Line_001.SPS: It contains information about the source, like its number, location, and elevation.
+Line_001.RPS: It contains information about the receivers, like their number, location, and elevation.
+Line_001.XPS: It contains information about the field record, like its number, which source it belongs to, the channels recorded, and the active receiver range.
 Geometry definition is one of the most time consuming in processing especially for 2D data. This process is for converting the observed field parameters recorded in observer logs into trace headers.
+
+ There are no zero coordinates, and all input records are accounted for.
 I wrote the Python code below `sps_check.ipynb` to check the SPS information regarding, total number of shots, total number of receivers...etc.\
 The program output the following information:
 
