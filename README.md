@@ -225,6 +225,51 @@ If you are happy with the results, apply same mute parameters to all shots
 #Apply mute to all shots
 Flow('mutes','lines','mutter slope0=0.2')
 ```
+### Subsampling
+Use **`sfspectra2`** to convert the data to f-k domain
+
+# spectra for shot 100
+
+```Shell
+Flow('spec100','mute100','spectra2')
+Plot('spec100',' grey color=j tile="spectra before subsampling"')
+Result('spec100','mute100 spec100','SideBySideAniso')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_before.png" width="700">
+The specta clearly shows the upper and lower frequency limits of the vibroseis sweep [8 - 95 Hz]. Carrying forth with 2 millisecond sampled data [Nyquist frequency 250 Hz] is clearly not required. We will resample to a 4 ms sample rate [Nyquist frquency of 125 Hz]. Since there are no frequencies above 95 Hz in this data we do not strictly need to first apply an anti-alias filter prior to resampling.
+```Shell
+
+#subsampling to 4ms
+Flow('subsample100', 'mute100', 'bandpass flo=3 fhi=125| window j1=2')
+Plot('subsample100','agc rect1=50 rect2=20 | grey title="Shot 100 after subsampling"')
+Flow('subspectra100','subsample100','spectra2')
+Plot('subspectra100','grey color=j title="Spectra after subsampling"')
+Result('subspectra100','subsample100 subspectra100','SideBySideAniso')
+
+# subsampling all shots to 4ms
+Flow('subsample', 'mutes', 'bandpass flo=3 fhi=125| window j1=2')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_after.png" width="700">
+
+
+Use **`sfmutter`** to mute the background noise
+
+```Shell
+# Seperate shot 100
+Flow('shot100','lines','window n3=1 f3=100')
+Result('shot100',' agc rect1=50 rect2=20  | grey title="Shot 100"')
+
+# Select muting parameter for background noise
+Flow('mute100','shot100','mutter  slope0=0.2')
+Plot('mute198','agc rect1=50 rect2=20 | grey title="Shot 198 after mute"')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/mutes.png" width="700">
+
+If you are happy with the results, apply same mute parameters to all shots
+```Shell
+#Apply mute to all shots
+Flow('mutes','lines','mutter slope0=0.2')
+```
 
 ### Map to regulat Geometry
 
