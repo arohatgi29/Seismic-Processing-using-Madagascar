@@ -252,6 +252,72 @@ Flow('subsample', 'mutes', 'bandpass flo=3 fhi=125| window j1=2')
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_after.png" width="700">
 
+### LTFT for Ground Roll attenuation
+Use **`sfltft`** to convert the data to local time frequency domain
+
+# ltft for shot 100
+
+```Shell
+# CalculateTime-frequency using LTFT
+Flow('ltft100','subsample100',
+     '''
+     ltft rect=20 verb=n nw=50 dw=2 niter=50
+     ''')
+Result('ltft100',
+       '''
+       math output="abs(input)" | real |
+       byte allpos=y gainpanel=100 pclip=99 |
+       grey3 color=j  frame1=120 frame2=7 frame3=71 label1=Time flat=n movie=2
+       unit1=s label3=Offset label2="\F5 f \F-1" unit3=km
+       ''')
+```
+![Alt Text](https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/ltft.gif)
+
+Apply soft thresholding using **`sfthreshold2`** . Remove the low energy values and keep the higher energy one (assumed to be ground rolls)
+```Shell
+
+Flow('thr100','ltft100',
+     '''
+     transp plane=23 memsize=1000 |
+     threshold2 pclip=25 verb=y |
+     transp plane=23 memsize=1000
+     ''')
+Result('thr100',
+       '''
+       math output="abs(input)" | real |
+       byte allpos=y gainpanel=100 pclip=99 |
+       grey3 color=j  frame1=120 frame2=7 frame3=71 label1=Time flat=n 
+       unit1=s label3=Offset label2="\F5 f \F-1" unit3=km
+       screenht=10 screenratio=0.7 parallel2=n format2=%3.1f
+       point1=0.8 point2=0.3 wanttitle=n labelfat=4 font=2 titlefat=4
+       ''')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/thresholding.png" width="700">
+
+Apply inverse ltft by using parameter inv=y
+```Shell
+# # Denoise
+Flow('noise100','thr100','ltft inv=y | mutter t0=-0.5 v0=0.7')
+Plot('noise100',
+     'agc rect1=50 rect2=20 | grey title="Ground-roll 100" unit2=km labelfat=4 titlefat=4')
+
+Flow('signal100','subsample100 noise100','add scale=1,-1 ${SOURCES[1]}')
+Plot('signal100',
+     'agc rect1=50 rect2=20 | grey title="Ground-roll removal" labelfat=4 titlefat=4')
+Result('sn100','mute100 signal100 noise100','SideBySideAniso')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/GR%20Removal.png" width="700">
+
+Apply LTFT and thresholding to all the shots
+```Shell
+
+# apply ltft to all shots
+Flow('ltft','subsample',
+     '''
+     ltft rect=20 verb=n nw=50 dw=2 niter=50
+     ''')
+```
+
 
 Use **`sfmutter`** to mute the background noise
 
