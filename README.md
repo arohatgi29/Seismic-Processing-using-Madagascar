@@ -142,6 +142,8 @@ savefig("geometry.png")
 
 
 ### Update the headers to have sourece, receiver coordinates and offset
+Use **`sfintbin`** to take input a 2-D trace file and trace headers to arrange input traces in a 3-D cube
+
 
 ```Shell
 # Arrange receiver coordinates 
@@ -189,31 +191,39 @@ Use **`sfheaderattr`** in terminal to check the header file:
 
 ###  Visualize regular geometry
 ```Shell
-Result('line_0',
+Flow('lines','line_0','put label3=Source d3=0.05  o3=688  unit3=km  label2=Offset d2=0.025 o2=-3.5 unit2=km label1=Time unit1=s')
+Result('lines',
        '''
        transp memsize=1000 plane=23 |
        byte gainpanel=each |
        grey3 frame1=500 frame2=100 frame3=120 flat=n movie=2
        title="Raw Data"
        ''')
+
 ```
-Use **`line_0.view`** to see the results
+Use **`lines.view`** to see the results
 ![Alt Text](https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Presentation4.gif)
 
 
-### Compute statics
+### First break mute
+
+Use **`sfmutter`** to mute the background noise
 
 ```Shell
-# Arrange receiver coordinates 
-shots = []
-for shot in range(lines['S']):
-    line = 'line%d' % shot
-    Flow(line,'R','window f2=%d n2=282' % (2*shot))
-    shots.append(line)
-Flow('rece',shots,'cat axis=3 ${SOURCES[1:%d]}' % len(shots))
-Flow('sour','S','spray axis=2 n=282 o=0 d=1')
+# Seperate shot 100
+Flow('shot100','lines','window n3=1 f3=100')
+Result('shot100',' agc rect1=50 rect2=20  | grey title="Shot 100"')
 
-# update the headers
+# Select muting parameter for background noise
+Flow('mute100','shot100','mutter  slope0=0.2')
+Plot('mute198','agc rect1=50 rect2=20 | grey title="Shot 198 after mute"')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/mutes.png" width="700">
+
+If you are happy with the results, apply same mute parameters to all shots
+```Shell
+#Apply mute to all shots
+Flow('mutes','lines','mutter slope0=0.2')
 ```
 
 ### Map to regulat Geometry
