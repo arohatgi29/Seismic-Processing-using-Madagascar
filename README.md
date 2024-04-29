@@ -520,7 +520,7 @@ Flow('median','nmo','tvmf nfw=11 | bandpass flo=5 | bandpass fhi=95')
 ```
 I am showing results of stack before after apply median filter
 
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Median.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Median.png" width="1200">
 
 
 
