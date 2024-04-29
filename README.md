@@ -368,6 +368,110 @@ Flow('ltft','subsample',
      ''')
 ```
 
+### Convert Shots to CMPs
+
+Use **`sfshot2cmp`** to convert shot gathers to smp gathers
+
+```Shell
+Flow('cmps','signal',
+     '''
+     mutter v0=3. |
+     shot2cmp half=n | put o2=-1.75 d2=0.05 label2="Half-offset"
+     ''')
+
+Result('cmps',
+       '''
+       byte gainpanel=each | window j3=2 |
+       grey3 frame1=500 frame2=36 frame3=321 flat=n
+       title="CMP gathers" point1=0.7 label2=Offset label3=Midpoint
+       ''')
+```
+
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/CMPs.png" width="700">
+
+Extract CMP 300 for velocity analysis
+
+```Shell
+
+Flow('cmp1','cmps','window n3=1 f3=300')
+Plot('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
+Result('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/1cmp.png" width="700">
+
+### Velocity Scan and NMO
+
+Use **`sfvscan`** to get seismic velocity analysis by scanning stacking velocities
+Use **`sfpick`** for automated picking. Also, here I have used mute.c program to improve the picking process.
+
+```Shell
+# Velocity scan
+
+Flow('vscan1','cmp1',
+     '''
+    vscan semblance=y v0=1.0 nv=75 dv=0.05 half=y
+     ''')
+Plot('vscan1',
+     '''
+     grey color=j allpos=y title="Semblance Scan" unit2=km/s
+     ''')
+
+mute = Program('mute.c')
+
+Flow('vmute1','vscan1 %s' % mute[0],
+     './${SOURCES[1]} t1=0.5 v1=4')
+
+Plot('vmute1',
+     '''
+     grey color=j allpos=y title="Semblance Scan" unit2=km/s
+     ''')
+
+# # Automatic pick
+
+Flow('vpick1','vmute1','pick rect1=10 rect2=20 gate=50 an=10')
+Plot('vpick1',
+     '''
+     graph yreverse=y transp=y plotcol=7 plotfat=7 
+     pad=n min2=1.4 max2=3.8 wantaxis=n wanttitle=n
+     ''')
+
+Plot('vscan2','vmute1 vpick1','Overlay')
+
+# # NMO
+
+Flow('nmo1','cmp1 vpick1',
+     'nmo half=y  velocity=${SOURCES[1]}')
+Plot('nmo1','agc rect1=50 rect2=20  | grey title="NMO CMP 300"')
+Result('nmo1','agc rect1=50 rect2=20  | grey title="NMO CMP 300"')
+
+
+Result('nmo1plot','cmp1 vscan2 nmo1','SideBySideAniso')
+
+```
+
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_mute.png" width="700">
+
+Extract CMP 300 for velocity analysis
+
+```Shell
+
+Flow('cmp1','cmps','window n3=1 f3=300')
+Plot('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
+Result('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/1cmp.png" width="700">
+
+
+
+
+
+
+
+
+
+
+
+
 
 Use **`sfmutter`** to mute the background noise
 
