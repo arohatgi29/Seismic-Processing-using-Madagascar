@@ -451,15 +451,53 @@ Result('nmo1plot','cmp1 vscan2 nmo1','SideBySideAniso')
 
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_mute.png" width="700">
 
-Extract CMP 300 for velocity analysis
+Apply NMO correction to all CMPs
 
 ```Shell
 
-Flow('cmp1','cmps','window n3=1 f3=300')
-Plot('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
-Result('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
+# NMO on all CMPS
+v0 = 1.0
+dv = 0.05
+nv = 75
+
+# Velocity scanning for all CMP gathers
+Flow('scn','cmps',
+     '''
+     vscan semblance=y v0=%g nv=%d dv=%g half=y str=0 |
+     mutter v0=0.9 t0=-4.5 inner=y
+     ''' % (v0,nv,dv),split=[3,1285])
+
+Flow('mute','scn %s' % mute[0],
+     './${SOURCES[1]} t1=0.5 v1=4')
+
+Flow('vel','mute','pick rect1=10 rect2=20 gate=50 an=10 | window')
+Result('vel',
+       '''
+       grey title="NMO Velocity" label1="Time" label2="Lateral"
+       color=j scalebar=y allpos=y bias=2.1 barlabel="Velocity"
+       barreverse=y o2num=1 d2num=1 n2tic=3 labelfat=4 font=2 titlefat=4
+       ''')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/1cmp.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_velocity.png" width="700">
+
+```Shell
+
+# NMO
+Flow('nmo','cmps vel',
+     '''
+     nmo velocity=${SOURCES[1]} half=y
+     ''')
+
+Result('nmo',
+       '''
+       byte gainpanel=each | 
+       grey3 frame1=500 frame2=36 frame3=642 flat=n
+       title="NMOed Data" point1=0.7
+       label2=Offset label3=Midpoint
+       ''')
+
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmoed.png" width="700">
 
 
 
