@@ -255,8 +255,6 @@ Flow('subsample', 'mutes', 'bandpass flo=3 fhi=125| window j1=2')
 ### FK filter for Ground Roll attenuation
 Use **`sffft1 and sffft3`* to convert the data to time frequency domain
 
-# ltft for shot 100
-
 ```Shell
 Flow('fk','subsample100','fft1 | fft3')
 Result('fks','fk',
