@@ -252,7 +252,59 @@ Flow('subsample', 'mutes', 'bandpass flo=3 fhi=125| window j1=2')
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_after.png" width="700">
 
-### LTFT for Ground Roll attenuation
+### FK filter for Ground Roll attenuation
+Use **`sffft1 and sffft3`* to convert the data to time frequency domain
+
+# ltft for shot 100
+
+```Shell
+Flow('fk','subsample100','fft1 | fft3')
+Result('fks','fk',
+       '''
+       real | 
+       grey color=j 
+       title="F-K spectra"
+       ''')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_spectra.png" width="700">
+
+In this case, just by looking the spectra it is difficult to tell which part is noise and which part is signal. Energy at the centre part of the spectra look denser, which is beleived to be ground roll. To mute that part, run-
+```Shell
+
+Flow('rmutter','fk','real | mutter slope0=3 ')
+Flow('imutter','fk','imag | mutter slope0=3 ')
+Plot('rfks','rmutter',
+       '''
+       grey color=j
+       title="Muted F-K spectra"
+       ''')
+Flow('mutter','rmutter imutter','cmplx ${SOURCES[:2]}')
+Flow('inoi','mutter',
+     '''
+     fft3 inv=y |
+     fft1 inv=y |
+     mutter slope0=3 inner=n
+     ''')
+Plot('inoi',' agc rect1=50 rect2=20  | grey title="Ground Roll"')  # noise
+Result('inoi','rfks inoi','SideBySideAniso')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/ifft.png" width="700">
+
+Subtract Ground roll from the signal
+```Shell
+Flow('isig','subsample100 inoi',
+     '''
+     add scale=1,-1 ${SOURCES[1]}
+     ''')
+
+Plot('isig','agc rect1=50 rect2=20  | grey title="After Ground Roll Attenuation"')
+
+Result('fk_filter','subsample100 inoi ifk','SideBySideAniso')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_final.png" width="700">
+
+
+### LTFT for better Ground Roll attenuation
 Use **`sfltft`** to convert the data to local time frequency domain
 
 # ltft for shot 100
