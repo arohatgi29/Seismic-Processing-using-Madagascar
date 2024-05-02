@@ -61,7 +61,7 @@ Use **`sfheaderattr`** in terminal to check the header file:
 ```Shell
 < tline.rsf sfheaderattr
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png">
 
 #### Windowing and viewing data
 As an example, the code below run a display in wiggles for one shot gather `shot gather FFID#231`. It is always a good idea to look at some small part of the data to check if data exists. 
@@ -75,7 +75,7 @@ Result('first',
 ```
 Use **`scons first.view`** to view first 1000 traces
 
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000.png" >
 
 
 #### Apply Automatic Gain control for better visualization
@@ -90,7 +90,7 @@ Result('firstagc',
 ```
 Use **`scons firstagc.view`** to view first 1000 traces
 
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000_agc.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000_agc.png">
 
 ### Setting geometry
 The data we have: We've received seismic data along with four ASCII files:
@@ -250,7 +250,7 @@ Result('subspectra100','subsample100 subspectra100','SideBySideAniso')
 # subsampling all shots to 4ms
 Flow('subsample', 'mutes', 'bandpass flo=3 fhi=125| window j1=2')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_after.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_after.png" >
 
 ### FK filter for Ground Roll attenuation
 Use **`sffft1 and sffft3`* to convert the data to time frequency domain
@@ -264,7 +264,7 @@ Result('fks','fk',
        title="F-K spectra"
        ''')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_spectra.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_spectra.png">
 
 In this case, just by looking the spectra it is difficult to tell which part is noise and which part is signal. Energy at the centre part of the spectra look denser, which is beleived to be ground roll. To mute that part, run-
 ```Shell
@@ -286,7 +286,7 @@ Flow('inoi','mutter',
 Plot('inoi',' agc rect1=50 rect2=20  | grey title="Ground Roll"')  # noise
 Result('inoi','rfks inoi','SideBySideAniso')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/ifft.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/ifft.png">
 
 Subtract Ground roll from the signal
 ```Shell
@@ -299,7 +299,7 @@ Plot('isig','agc rect1=50 rect2=20  | grey title="After Ground Roll Attenuation"
 
 Result('fk_filter','subsample100 inoi ifk','SideBySideAniso')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_final.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_final.png" >
 
 ### LTFT for better Ground Roll attenuation
 Use **`sfltft`** to convert the data to local time frequency domain
@@ -552,7 +552,7 @@ Result('nmo1plot','cmp1 vscan2 nmo1','SideBySideAniso')
 
 ```
 
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_mute.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_mute.png" >
 
 Apply NMO correction to all CMPs
 
@@ -581,7 +581,7 @@ Result('vel',
        barreverse=y o2num=1 d2num=1 n2tic=3 labelfat=4 font=2 titlefat=4
        ''')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_velocity.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_velocity.png">
 
 ```Shell
 
@@ -637,8 +637,63 @@ We are showing results of stack before after apply median filter
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/median_comparison.png">
 
 
+### Kirchoff post stack time migration
 
+```Shell
+# 2D cosine transform
+Flow('cosft','stack_median',
+     '''
+     cosft sign1=1 sign2=1 | window max1=90 | 
+     mutter v0=1 half=n | put label2=Wavenumber
+     ''')
+Result('cosft','grey title="Cosine Transform" pclip=95')
 
+# Ensemble of Stolt migrations with different velocities
+Flow('spray','cosft',
+     '''
+     spray axis=3 n=90 o=1.5 d=0.06
+     label=Velocity unit=km/s
+     ''')
+Flow('map','spray',
+     'math output="sqrt(x1*x1+0.25*x3*x3*x2*x2)" ')
+Result('map',
+       '''
+       byte gainpanel=all allpos=y | 
+       grey3 title="Stolt Ensemble Map" 
+       frame1=400 frame2=1000 frame3=50 color=x
+       ''')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/map.png">
+
+```Shell
+Flow('mig','spray map',
+     '''
+     iwarp warp=${SOURCES[1]} inv=n | pad n1=751 | 
+     cosft sign1=-1 sign2=-1
+     ''')
+Flow('migt','mig','transp plane=23 memsize=5000')
+Plot('mig',
+    'grey title="Ensemble of Stolt Migrations" ',view=1)
+
+# Migration velocity increasing with time
+Flow('vmig','stack_median','math output="1.5+0.06*x1" ')
+Result('vmig',
+       '''
+       grey color=j mean=y barreverse=y 
+       title="Migration Velocity" 
+       scalebar=y barlabel=Velocity barunit=km/s
+       ''')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/vmig.png">
+
+```Shell
+# Slice through the ensemble of migrations
+Flow('slice','migt vmig','slice pick=${SOURCES[1]}')
+Result('mig','slice',
+      'grey title="Stolt Migration with Variable Velocity" ')
+
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/final_migrated.png">
 
 </details>
 
