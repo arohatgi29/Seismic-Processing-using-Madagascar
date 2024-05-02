@@ -138,7 +138,7 @@ plot!(rx, ry, label = "Receiver", markershape=:x)
 
 savefig("geometry.png")
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/geometry.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/geometry.png">
 
 
 ### Update the headers to have sourece, receiver coordinates and offset
@@ -186,7 +186,7 @@ Flow('header_new','line_0 tline_0 sx sy rx ry o',
      'segyheader tfile=${SOURCES[1]} sx=${SOURCES[2]} sy=${SOURCES[3]} gx=${SOURCES[4]} gy=${SOURCES[5]} offset=${SOURCES[6]}')
 ```
 Use **`sfheaderattr`** in terminal to check the header file:
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/New_headers.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/New_headers.png">
 
 
 ###  Visualize regular geometry
@@ -218,7 +218,7 @@ Result('shot100',' agc rect1=50 rect2=20  | grey title="Shot 100"')
 Flow('mute100','shot100','mutter  slope0=0.2')
 Plot('mute198','agc rect1=50 rect2=20 | grey title="Shot 198 after mute"')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/mutes.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/mutes.png">
 
 If you are happy with the results, apply same mute parameters to all shots
 ```Shell
@@ -235,7 +235,7 @@ Flow('spec100','mute100','spectra2')
 Plot('spec100',' grey color=j tile="spectra before subsampling"')
 Result('spec100','mute100 spec100','SideBySideAniso')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_before.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_before.png">
 The specta clearly shows the upper and lower frequency limits of the vibroseis sweep [8 - 95 Hz]. Carrying forth with 2 millisecond sampled data [Nyquist frequency 250 Hz] is clearly not required. We will resample to a 4 ms sample rate [Nyquist frquency of 125 Hz]. Since there are no frequencies above 95 Hz in this data we do not strictly need to first apply an anti-alias filter prior to resampling.
 
 ```Shell
@@ -341,7 +341,7 @@ Result('thr100',
        point1=0.8 point2=0.3 wanttitle=n labelfat=4 font=2 titlefat=4
        ''')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/thresholding.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/thresholding.png">
 
 Apply inverse ltft by using parameter inv=y
 ```Shell
@@ -355,7 +355,7 @@ Plot('signal100',
      'agc rect1=50 rect2=20 | grey title="Ground-roll removal" labelfat=4 titlefat=4')
 Result('sn100','mute100 signal100 noise100','SideBySideAniso')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/GR%20Removal.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/GR%20Removal.png">
 
 Apply LTFT and thresholding to all the shots
 ```Shell
@@ -600,30 +600,41 @@ Result('nmo',
        ''')
 
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmoed.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmoed.png">
 
+### Stack
+
+Use **`sfstack`** 
+
+```Shell
+Flow('stack_nmo','nmo','stack')
+Result('stack_nmo',
+       '''
+       grey color=seismic title="NMOed data stack"
+       ''')
+```
+
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_stack.png">
 
 
 ### Time varying Median filter
 
 Use **`sftvmf`** to apply the filter attenuating prestack random, spike-like noise.
-I applied this on prestack nmo corrected CMP gathers.
+We applied this on prestack nmo corrected CMP gathers and stack them again. We can see near surface noise sttenuation and refelctors are more visible.
 
 ```Shell
 Flow('median','nmo','tvmf nfw=11 | bandpass flo=5 | bandpass fhi=95')
+Flow('stack_median','median','stack')
+Plot('stack_median',
+       '''
+       grey color=seismic title="Stack after median filter"
+       ''')
 
+Result('tvmf','stack_nmo stack_median','SideBySideAniso')
 ```
+We are showing results of stack before after apply median filter
 
-### stack
-
-Use **`sfstack`** to stack
-```Shell
-Flow('median','nmo','tvmf nfw=11 | bandpass flo=5 | bandpass fhi=95')
-
-```
-I am showing results of stack before after apply median filter
-
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Median.png" width="1200">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/median_comparison.png">
 
 
 
