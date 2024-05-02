@@ -1,41 +1,43 @@
 # Seismic-Processing-using-Madagascar
 # Table of contents
 * [Seismic processing of 2D line](#seismic-processing-of-2D-line)
-  * [Reading and viewing seismic data](#reading-and-viewing-seismic-data)
+  * [Fetching and reading seismic data](#Fetch-the-seismic-data)
   * [Setting geometry](#setting-geometry)
-  * [Python code for geometry headers update](#python-code-for-geometry-headers-update)
-  * [Viewing shot gathers QC](#viewing-shot-gathers-(QC))
-  * [CMP locations QC and binning](#cmp-locations-qc-and-binning)
-  * [Sort data to CMP](#sort-data-to-cmp)
-  * [Gain testing](#gain-testing)
-  * [NMO Correction and brute stack](#nmo-correction-and-brute-stack)
-  * [Filtering in the (F-k) domain](#filtering-in-the-f-k-domain)
-  * [Band Pass Filter testing](#band-pass-filter-testing)
-  * [Deconvolution](#deconvolution)
-  * [Velocity Analysis](#velocity-analysis)
+  * [Update the headers](#python-code-for-geometry-headers-update)
+  * [Viewing shot gather](#viewing-shot-gathers-(QC))
+  * [First break mute](#cmp-locations-qc-and-binning)
+  * [Subsampling the data](#sort-data-to-cmp)
+  * [Ground roll attenuation](#gain-testing)
+  * [Surface consistent amplitude correction](#nmo-correction-and-brute-stack)
+  * [Sort to CMPs](#filtering-in-the-f-k-domain)
+  * [Velocity analysis and NMO](#band-pass-filter-testing)
+  * [Time varying median filter](#deconvolution)
+  * [Stack](#velocity-analysis)
+  * [Stolt's Migration](#velocity-analysis)
  
 
 
 ## Seismic processing of 2D line
-For this tutorial we are going to explain step by step on how to process 2D seismic data using Seismic Unix. The data for this document can be accessed for free [here!](https://dataunderground.org/dataset/poland-vibroseis/resource/96dfd0be-61c8-4edb-9d04-c7d2aeb16d27).
+We processed 2D seismic data using Madagascar.
+The data for this document can be accessed for free [here!](https://dataunderground.org/dataset/poland-vibroseis/resource/96dfd0be-61c8-4edb-9d04-c7d2aeb16d27).
 Below is the proposed processing flow chart that we will follow.
 
 ```mermaid
 graph TD;
-    A(SEGY Input)-->B(Coonvert to SU format);
-    B-->C(Geometry update);
-    C-->D(Shot gathers QC);
-    C-->E(Elevation Statics);
+    A(SEGY Input)-->B(Coonvert to RSF format);
+    B-->C(Initial data check);
+    C-->D(Update headers);
+    C-->E(Setting Geometry);
     D-->E;
-    E-->F(Trace Editing);
-    F-->G(Ground roll removal, F-K filter);
-    G-->H(Deconvolution);
-    H-->I(Band Pass Filter);
-    I-->J(CMP Sort);
+    E-->F(Automatic gain control);
+    F-->G(First break mute);
+    G-->H(Frequency analysis and subsampling);
+    H-->I(Ground roll attenuation via FK and LTFT);
+    I-->J( Surface consitent amplitude correction);
     J-->K(Velocity Analysis);
     K-->L(NMO Correction);
     J-->L;
-    L-->M(Mute)
+    L-->M(Time varying median filter)
     M-->N(Stack)
     N-->O(Migration)
 
