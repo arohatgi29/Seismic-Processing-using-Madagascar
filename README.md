@@ -53,19 +53,19 @@ Flow(files,tgz,
      'gunzip -c $SOURCE | tar -xvf -',stdin=0,stdout=-1)
 ```
 ### Convert sgy to rsf format
-Use **`sfsegyread`** to read the sgy file.
+**`sfsegyread`** to read the sgy file.
 ```Shell
 Flow('line tline','Line_001.sgy','segyread tfile=${TARGETS[1]}')
 
 ```
-Use **`sfheaderattr`** in terminal to check the header file:
+**`sfheaderattr`** to check the header file:
 ```Shell
 < tline.rsf sfheaderattr
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png">
 
 #### Windowing and viewing data
-Use **`sfwindow`** to check first 1000 traces.  It is always a good idea to look at some small part of the data to check if data exists. 
+**`sfwindow`** to check first 1000 traces.  It is always a good idea to look at some small part of the data to check if data exists. 
 
 ```Shell
 Flow('first','line','window n2=1000' )
@@ -74,13 +74,13 @@ Result('first',
        grey title="First 1000 traces"
        ''')
 ```
-Use **`scons first.view`** to view first 1000 traces
+**`scons first.view`** to view first 1000 traces
 
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000.png" >
 
 
 #### Apply Automatic Gain control for better visualization
-Use **`sfagc`** to apply agc to windowed traces. The smoothing is controlled by rect#= and repeat= parameters
+ **`sfagc`** to apply agc to windowed traces. The smoothing is controlled by rect#= and repeat= parameters
 ```Shell
 
 Flow('firstagc','first','agc rect1= 20 rect2=50')
@@ -183,13 +183,13 @@ Flow('o', 'offset', 'dd type=int')
 Flow('header_new','line_0 tline_0 sx sy rx ry o',
      'segyheader tfile=${SOURCES[1]} sx=${SOURCES[2]} sy=${SOURCES[3]} gx=${SOURCES[4]} gy=${SOURCES[5]} offset=${SOURCES[6]}')
 ```
-Use **`sfheaderattr`** in terminal to check the header file:
+**`sfheaderattr`** to check the header file:
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/New_headers.png">
 
 
 ###  Visualize regular geometry
 
-We used **`sfintbin`** to take input a 2-D trace file and trace headers to arrange input traces in a 3-D cube
+**`sfintbin`** to take input a 2-D trace file and trace headers to arrange input traces in a 3-D cube
 
 ```Shell
 Flow('lines','line_0','put label3=Source d3=0.05  o3=688  unit3=km  label2=Offset d2=0.025 o2=-3.5 unit2=km label1=Time unit1=s')
@@ -210,7 +210,7 @@ Result('lines',
 
 For simplicity, we extracted shot 100 for initial analysis and for decing the parameters before applying it to complete data.
 
-We used **`sfwindow`** to seperate shot 100 and **`sfmutter`** to mute the background noise
+**`sfwindow`** to seperate shot 100 and **`sfmutter`** to mute the background noise
 
 ```Shell
 # Seperate shot 100
@@ -230,7 +230,7 @@ Flow('mutes','lines','mutter slope0=0.2')
 ```
 
 ### Subsampling
-Use **`sfspectra2`** to convert the data to f-k domain
+**`sfspectra2`** to convert the data to f-k domain
 
 # spectra for shot 100
 
@@ -257,7 +257,7 @@ Flow('subsample', 'mutes', 'bandpass flo=3 fhi=125| window j1=2')
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_after.png" >
 
 ### FK filter for Ground Roll attenuation
-Use **`sffft1 and sffft3`* to convert the data to time frequency domain
+**`sffft1 and sffft3`* to convert the data to time frequency domain
 
 ```Shell
 Flow('fk','subsample100','fft1 | fft3')
@@ -307,7 +307,7 @@ Result('fk_filter','subsample100 inoi ifk','SideBySideAniso')
 
 ### LTFT for better Ground Roll attenuation
 We applied the LTF decomposition to obtain a time-frequency distribution.  We applied the forward LTF decomposition to each trace to generate a time-frequency cube. 
-Use **`sfltft`** to convert the data to local time frequency domain
+**`sfltft`** to convert the data to local time frequency domain
 
 # ltft for shot 100
 
@@ -478,7 +478,7 @@ It is difficult to tell the differences after amplitude correction. Therefore, w
 
 ### Convert Shots to CMPs
 
-We used **`sfshot2cmp`** to convert shot gathers to cmp gathers
+ **`sfshot2cmp`** to convert shot gathers to cmp gathers
 
 ```Shell
 Flow('cmps','signal',
@@ -612,7 +612,7 @@ Result('nmo',
 
 ### Stack
 
-Use **`sfstack`** 
+**`sfstack`** 
 
 ```Shell
 Flow('stack_nmo','nmo','stack')
@@ -627,7 +627,7 @@ Result('stack_nmo',
 
 ### Time varying Median filter
 
-Use **`sftvmf`** to apply the filter attenuating prestack random, spike-like noise.
+**`sftvmf`** to apply the filter attenuating prestack random, spike-like noise.
 We applied this on prestack nmo corrected CMP gathers and stack them again. We can see near surface noise sttenuation and refelctors are more visible.
 
 ```Shell
