@@ -302,6 +302,115 @@ Result('fk_filter','subsample100 inoi ifk','SideBySideAniso')
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_final.png" width="700">
 
 
+### Surface Consistent Amplitude Corrections
+Use **`surface-cosistent.c`** file
+
+# ltft for shot 100
+
+```Shell
+# Average trace amplitude
+Flow('arms','signal',
+     'mul $SOURCE | stack axis=1 | math output="log(input)" ')
+Plot('arms','grey title="Log-Amplitude" mean=y pclip=90')
+
+# Remove long-period offset term
+Flow('arms2','arms','smooth rect1=5 | add scale=-1,1 $SOURCE')
+Plot('arms2','grey title="Log-Amplitude after removing long-period offset" clip=1.13')
+Result('arm','arms arms2','SideBySideAniso')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/long-period%20offset.png" width="700">
+
+```Shell
+# Integer indeces for different terms
+Flow('shot','arms2','math output="(x2-688)/0.05" ')
+Flow('offsets','arms2','math output="(x1+3.5)/0.025" ')
+Flow('receiver','arms2',
+     'math output="(x1+x2-688+3.5)/0.025" ')
+Flow('cmp','arms2',
+     'math output="(x1/2+x2-688+3.5/2)*2/0.0.5" ')
+
+nx = 282 # number of offsets
+ns = 251 # number of shots
+nt = nx*ns # number of traces
+
+Flow('index','shot offsets receiver cmp',
+     '''
+     cat axis=3 ${SOURCES[1:4]} | dd type=int | 
+     put n1=%d n2=4 n3=1
+     ''' % nt)
+
+# Transform from 2-D to 1-D
+Flow('arms1','arms2','put n2=1 n1=%d' % nt)
+
+prog = Program('surface-consistent.c')
+sc = str(prog[0])
+
+Flow('model',['arms1','index',sc],
+     './${SOURCES[2]} index=${SOURCES[1]} verb=y')
+
+# Least-squares inversion by conjugate gradients
+Flow('sc',['arms1','index',sc,'model'],
+     '''
+     conjgrad ./${SOURCES[2]} index=${SOURCES[1]} 
+     mod=${SOURCES[3]} niter=30
+     ''')
+
+
+Flow('scarms',['sc','index',sc],
+     '''
+     ./${SOURCES[2]} index=${SOURCES[1]} adj=n | 
+     put n1=%d n2=%d
+     ''' % (nx,ns))
+Result('scarms',
+       '''
+       grey mean=y title="Surface-Consistent Log-Amplitude" 
+       clip=1.13
+       ''')
+
+Flow('adiff','arms2 scarms','add scale=1,-1 ${SOURCES[1]}')
+Result('adiff','grey title=Difference clip=1.13')
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/sc%20amplitude.png" width="700">
+
+```Shell
+Flow('ampl','scarms',
+     '''
+     math output="exp(-input/2)" |
+     spray axis=1 n=751 d=0.004 o=0
+     ''')
+Flow('ashots','signal ampl',
+     'mul ${SOURCES[1]} | cut n3=1 f3=49')
+
+
+Plot('signal',
+       '''transp memsize=1000 plane=23 |
+       byte gainpanel=each |
+       grey3 frame1=500 frame2=100 frame3=120 flat=n 
+       title="'Shots before Amplitude Normalization"''')
+
+Plot('ashots',
+              '''transp memsize=1000 plane=23 |
+       byte gainpanel=each |
+       grey3 frame1=500 frame2=100 frame3=120 flat=n
+       title="'Shots after Amplitude Normalization"''')
+Result('ashots','signal ashots','SideBySideAniso')
+
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/before_after_sc.png" width="700">
+
+It is difficult to tell the differences after amplitude correction. Therefore, I stacked both the nmo corrected cmps gathers before and amplitude correction and took the difference. The difference looks reasonable.
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Stack_SC.png">
+
+Apply LTFT and thresholding to all the shots
+```Shell
+
+# apply ltft to all shots
+Flow('ltft','subsample',
+     '''
+     ltft rect=20 verb=n nw=50 dw=2 niter=50
+     ''')
+```
+
 ### LTFT for better Ground Roll attenuation
 Use **`sfltft`** to convert the data to local time frequency domain
 
