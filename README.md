@@ -486,7 +486,7 @@ Result('cmps',
        ''')
 ```
 
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/CMPs.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/CMPs.png">
 
 Extract CMP 300 for velocity analysis
 
@@ -496,12 +496,16 @@ Flow('cmp1','cmps','window n3=1 f3=300')
 Plot('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
 Result('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/1cmp.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/1cmp.png">
 
 ### Velocity Scan and NMO
 
 Use **`sfvscan`** to get seismic velocity analysis by scanning stacking velocities
 Use **`sfpick`** for automated picking. Also, here I have used mute.c program to improve the picking process.
+
+We applied a muting function to the semblance gather to guide the automaticpicker to higher velocities. Simple muting by cutting a lower-left triangle cornerfrom the semblance scan is implemented in the attached **`mute.c`**  function. NMO without mute.c function-
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo1.png">
+
 
 ```Shell
 # Velocity scan
