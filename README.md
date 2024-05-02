@@ -305,8 +305,6 @@ Result('fk_filter','subsample100 inoi ifk','SideBySideAniso')
 ### Surface Consistent Amplitude Corrections
 Use **`surface-cosistent.c`** file
 
-# ltft for shot 100
-
 ```Shell
 # Average trace amplitude
 Flow('arms','signal',
@@ -318,7 +316,7 @@ Flow('arms2','arms','smooth rect1=5 | add scale=-1,1 $SOURCE')
 Plot('arms2','grey title="Log-Amplitude after removing long-period offset" clip=1.13')
 Result('arm','arms arms2','SideBySideAniso')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/long-period%20offset.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/long-period%20offset.png">
 
 ```Shell
 # Integer indeces for different terms
@@ -370,7 +368,7 @@ Result('scarms',
 Flow('adiff','arms2 scarms','add scale=1,-1 ${SOURCES[1]}')
 Result('adiff','grey title=Difference clip=1.13')
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/sc%20amplitude.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/sc%20amplitude.png">
 
 ```Shell
 Flow('ampl','scarms',
@@ -396,7 +394,7 @@ Plot('ashots',
 Result('ashots','signal ashots','SideBySideAniso')
 
 ```
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/before_after_sc.png" width="700">
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/before_after_sc.png">
 
 It is difficult to tell the differences after amplitude correction. Therefore, I stacked both the nmo corrected cmps gathers before and amplitude correction and took the difference. The difference looks reasonable.
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Stack_SC.png">
