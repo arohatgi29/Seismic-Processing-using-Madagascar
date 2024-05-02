@@ -376,7 +376,8 @@ Flow('ltft','subsample',
 
 ### Surface Consistent Amplitude Corrections
 
-Use **`surface-cosistent.c`** file
+The surface-consistent model (Taner and Koehler, 1981) tries to explain the trace amplitude as a function of source and receiver locations A(s, r) using a
+product of several factors (source, receiver, offset, and midpoint).
 
 ```Shell
 # Average trace amplitude
@@ -391,6 +392,8 @@ Result('arm','arms arms2','SideBySideAniso')
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/long-period%20offset.png">
 
+
+We solved the system using the least-squares method and the iterative conjugate-gradient algorithm. The algorithm requires implementingthe linear operator and its adjoint. The implementation of the linear operator is provided in the  **`surface-cosistent.c`**  program
 ```Shell
 # Integer indeces for different terms
 Flow('shot','arms2','math output="(x2-688)/0.05" ')
@@ -425,7 +428,6 @@ Flow('sc',['arms1','index',sc,'model'],
      conjgrad ./${SOURCES[2]} index=${SOURCES[1]} 
      mod=${SOURCES[3]} niter=30
      ''')
-
 
 Flow('scarms',['sc','index',sc],
      '''
@@ -469,14 +471,14 @@ Result('ashots','signal ashots','SideBySideAniso')
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/before_after_sc.png">
 
-It is difficult to tell the differences after amplitude correction. Therefore, I stacked both the nmo corrected cmps gathers before and amplitude correction and took the difference. The difference looks reasonable.
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Stack_SC.png">
+It is difficult to tell the differences after amplitude correction. Therefore, we stacked both the nmo corrected cmps gathers before and amplitude correction and took the difference. The difference looks reasonable. Near-surface noise is removed after surface consistent amplitude correction.
 
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Stack_SC.png">
 
 
 ### Convert Shots to CMPs
 
-Use **`sfshot2cmp`** to convert shot gathers to smp gathers
+We used **`sfshot2cmp`** to convert shot gathers to cmp gathers
 
 ```Shell
 Flow('cmps','signal',
@@ -495,7 +497,7 @@ Result('cmps',
 
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/CMPs.png">
 
-Extract CMP 300 for velocity analysis
+Extracted CMP 300 for velocity analysis
 
 ```Shell
 
@@ -507,12 +509,11 @@ Result('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
 
 ### Velocity Scan and NMO
 
-Use **`sfvscan`** to get seismic velocity analysis by scanning stacking velocities
-Use **`sfpick`** for automated picking. Also, here I have used mute.c program to improve the picking process.
-
-We applied a muting function to the semblance gather to guide the automaticpicker to higher velocities. Simple muting by cutting a lower-left triangle cornerfrom the semblance scan is implemented in the attached **`mute.c`**  function. NMO without mute.c function-
+**`sfvscan`** to get seismic velocity analysis by scanning stacking velocities and **`sfpick`** for automated picking. 
+We applied a muting function to the semblance gather to guide the automaticpicker to higher velocities. 
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo1.png">
 
+Simple muting by cutting a lower-left triangle corner from the semblance scan is implemented in the attached **`mute.c`**  function. NMO without mute.c function-
 
 ```Shell
 # Velocity scan
