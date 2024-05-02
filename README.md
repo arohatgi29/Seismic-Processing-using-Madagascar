@@ -513,7 +513,7 @@ Result('cmp1',' agc rect1=50 rect2=20  | grey title="CMP 300"')
 We applied a muting function to the semblance gather to guide the automaticpicker to higher velocities. 
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo1.png">
 
-Simple muting by cutting a lower-left triangle corner from the semblance scan is implemented in the attached **`mute.c`**  function. NMO without mute.c function-
+Simple muting by cutting a lower-left triangle corner from the semblance scan is implemented in the attached **`mute.c`**  function. 
 
 ```Shell
 # Velocity scan
