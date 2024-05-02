@@ -18,9 +18,7 @@
 
 
 ## Seismic processing of 2D line
-We processed 2D seismic data using Madagascar.
-The data for this document can be accessed for free [here!](https://dataunderground.org/dataset/poland-vibroseis/resource/96dfd0be-61c8-4edb-9d04-c7d2aeb16d27).
-Below is the proposed processing flow chart that we will follow.
+We processed 2D seismic data using Madagascar. Below is the proposed processing flow chart that we will follow.
 
 ```mermaid
 graph TD;
@@ -44,6 +42,8 @@ graph TD;
 ```
 ### Fetch the Seismic data
 
+We used a land vibroseis dataset. The data for this document can be accessed for free [here!](https://wiki.seg.org/wiki/2D_Vibroseis_Line_001).
+
 ```Shell
 tgz = '2D_Land_data_2ms.tgz'
 Fetch(tgz,'freeusp')
@@ -53,12 +53,11 @@ Flow(files,tgz,
      'gunzip -c $SOURCE | tar -xvf -',stdin=0,stdout=-1)
 ```
 ### Convert sgy to rsf format
-
+Use **`sfsegyread`** to read the sgy file.
 ```Shell
 Flow('line tline','Line_001.sgy','segyread tfile=${TARGETS[1]}')
 
 ```
-
 Use **`sfheaderattr`** in terminal to check the header file:
 ```Shell
 < tline.rsf sfheaderattr
@@ -66,8 +65,8 @@ Use **`sfheaderattr`** in terminal to check the header file:
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/headers.png">
 
 #### Windowing and viewing data
-As an example, the code below run a display in wiggles for one shot gather `shot gather FFID#231`. It is always a good idea to look at some small part of the data to check if data exists. 
-Use **`sfwindow`** to check first 1000 traces:
+Use **`sfwindow`** to check first 1000 traces.  It is always a good idea to look at some small part of the data to check if data exists. 
+
 ```Shell
 Flow('first','line','window n2=1000' )
 Result('first',
@@ -90,21 +89,17 @@ Result('firstagc',
        grey title="First 1000 traces after Automatic Gain Control"
        ''')
 ```
-Use **`scons firstagc.view`** to view first 1000 traces
 
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/first1000_agc.png">
 
 ### Setting geometry
-The data we have: We've received seismic data along with four ASCII files:
+We received seismic data along with four ASCII files:
 Line_001.TXT: It contains information about the spacing between the source and receiver, numbering of shot points and receiver stations, reference velocity, reference level, and some other information.
 Line_001.SPS: It contains information about the source, like its number, location, and elevation.
 Line_001.RPS: It contains information about the receivers, like their number, location, and elevation.
 Line_001.XPS: It contains information about the field record, like its number, which source it belongs to, the channels recorded, and the active receiver range.
-Geometry definition is one of the most time consuming in processing especially for 2D data. This process is for converting the observed field parameters recorded in observer logs into trace headers.
 
- There are no zero coordinates, and all input records are accounted for.
-I wrote the Python code below `sps_check.ipynb` to check the SPS information regarding, total number of shots, total number of receivers...etc.\
-The program output the following information:
+There are no zero coordinates, and all input records are accounted for. A handy way to QC the source and receiver data is to plot the locations. We used awk to gather up the X,Y coordinate information from each of Line_001.SPS and Line_001.RPS. We separated the source and receiver coordinates and created csv file to read and plot the geometry in Julia.
 
 ```sh
 # for sx
@@ -119,10 +114,9 @@ cat Line_001.RPS | awk '{print $8}'
 # for ry
 cat Line_001.SRPS | awk '{print $9}'
 ```
-I worked on another Python script which uses the SPS information as input and outputs a text file containig the geometry information (the X, Y coordinates for source and receiver, the offset, and the static information.
 
 ### Julia code to plot the source and treceiver coordinates
-Below is the code to run in a Python environment.
+Below is the code to run in a Julia environment.
 
 ```Julia
 using Pkg
@@ -143,8 +137,10 @@ savefig("geometry.png")
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/geometry.png">
 
 
-### Update the headers to have sourece, receiver coordinates and offset
-Use **`sfintbin`** to take input a 2-D trace file and trace headers to arrange input traces in a 3-D cube
+### Update the headers to have source, receiver coordinates and offset
+Since, source, receiver , and offset coordinates are not in the header files, we edited the headers.
+
+We used **`sfintbin`** to take input a 2-D trace file and trace headers to arrange input traces in a 3-D cube
 
 
 ```Shell
