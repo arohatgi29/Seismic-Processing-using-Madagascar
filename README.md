@@ -140,8 +140,8 @@ savefig("geometry.png")
 ### Update the headers to have source, receiver coordinates and offset
 Since, source, receiver , and offset coordinates are not in the header files, we edited the headers.
 
-We used **`sfintbin`** to take input a 2-D trace file and trace headers to arrange input traces in a 3-D cube
-
+Line_001.SPS file has the Field Shot Point Number. The field shot point numbering covers the range from 701 to 1201 with an increment of 2 so that we have only odd field shot point numbers.
+Line_001.RPS file has the Field Group Number. Field group numbering in this survey completely cover the range 561 through 1342 with an increment of 1. Total number of source coordinates are 251 in Line_001.SPS file and total number of receiver coordinates are 782. We have in total, 251 sequential shots. Each shot record was recorded by 282 sequential receiver groups.
 
 ```Shell
 # Arrange receiver coordinates 
@@ -188,6 +188,9 @@ Use **`sfheaderattr`** in terminal to check the header file:
 
 
 ###  Visualize regular geometry
+
+We used **`sfintbin`** to take input a 2-D trace file and trace headers to arrange input traces in a 3-D cube
+
 ```Shell
 Flow('lines','line_0','put label3=Source d3=0.05  o3=688  unit3=km  label2=Offset d2=0.025 o2=-3.5 unit2=km label1=Time unit1=s')
 Result('lines',
@@ -199,13 +202,15 @@ Result('lines',
        ''')
 
 ```
-Use **`lines.view`** to see the results
+
 ![Alt Text](https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Presentation4.gif)
 
 
 ### First break mute
 
-Use **`sfmutter`** to mute the background noise
+For simplicity, we extracted shot 100 for initial analysis and for decing the parameters before applying it to complete data.
+
+We used **`sfwindow`** to seperate shot 100 and **`sfmutter`** to mute the background noise
 
 ```Shell
 # Seperate shot 100
@@ -218,11 +223,12 @@ Plot('mute198','agc rect1=50 rect2=20 | grey title="Shot 198 after mute"')
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/mutes.png">
 
-If you are happy with the results, apply same mute parameters to all shots
+Deciding slope as 0.2, we applied the same mute parameters to all shots
 ```Shell
 #Apply mute to all shots
 Flow('mutes','lines','mutter slope0=0.2')
 ```
+
 ### Subsampling
 Use **`sfspectra2`** to convert the data to f-k domain
 
@@ -264,7 +270,7 @@ Result('fks','fk',
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_spectra.png">
 
-In this case, just by looking the spectra it is difficult to tell which part is noise and which part is signal. Energy at the centre part of the spectra look denser, which is beleived to be ground roll. To mute that part, run-
+In this case, just by looking the spectra it is difficult to tell which part is noise and which part is signal. Energy at the centre part of the spectra looks denser, which is beleived to be ground roll. We muted that region.-
 ```Shell
 
 Flow('rmutter','fk','real | mutter slope0=3 ')
@@ -300,6 +306,7 @@ Result('fk_filter','subsample100 inoi ifk','SideBySideAniso')
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_final.png" >
 
 ### LTFT for better Ground Roll attenuation
+We applied the LTF decomposition to obtain a time-frequency distribution.  We applied the forward LTF decomposition to each trace to generate a time-frequency cube. 
 Use **`sfltft`** to convert the data to local time frequency domain
 
 # ltft for shot 100
@@ -320,7 +327,7 @@ Result('ltft100',
 ```
 ![Alt Text](https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/ltft.gif)
 
-Apply soft thresholding using **`sfthreshold2`** . Remove the low energy values and keep the higher energy one (assumed to be ground rolls)
+We applied soft thresholding using **`sfthreshold2`** . We removed the low energy values and keep the higher energy one (assumed to be ground rolls)
 ```Shell
 
 Flow('thr100','ltft100',
@@ -341,7 +348,7 @@ Result('thr100',
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/thresholding.png">
 
-Apply inverse ltft by using parameter inv=y
+The inverse LTF decomposition brings the separated signal back to the original domain
 ```Shell
 # # Denoise
 Flow('noise100','thr100','ltft inv=y | mutter t0=-0.5 v0=0.7')
@@ -353,9 +360,10 @@ Plot('signal100',
      'agc rect1=50 rect2=20 | grey title="Ground-roll removal" labelfat=4 titlefat=4')
 Result('sn100','mute100 signal100 noise100','SideBySideAniso')
 ```
+The difference between raw data and denoised result is shown below
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/GR%20Removal.png">
 
-Apply LTFT and thresholding to all the shots
+Then, we applied LTFT and thresholding to all the shots
 ```Shell
 
 # apply ltft to all shots
@@ -367,6 +375,7 @@ Flow('ltft','subsample',
 
 
 ### Surface Consistent Amplitude Corrections
+
 Use **`surface-cosistent.c`** file
 
 ```Shell
