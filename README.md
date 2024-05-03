@@ -581,7 +581,7 @@ Result('nmo1plot','cmp1 vscan2 nmo1','SideBySideAniso')
 
 ```
 
-<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_mute.png" >
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/nmo_a_mute.png" >
 
 Apply NMO correction to all CMPs
 
