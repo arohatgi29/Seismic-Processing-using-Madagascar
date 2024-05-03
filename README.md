@@ -204,6 +204,25 @@ Result('lines',
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/raw.png">
 
+### Raw Stack
+
+We converted the shot gathers to CMPs and stacked them before applying any processing steps to understand the initial noise in the data.
+
+```Shell
+Flow('rcmps','lines',
+     '''
+     shot2cmp half=n |
+     put o2=-1.75 d2=0.05 label2="Half-offset"
+     ''')
+Flow('rstack','rcmps','stack')
+Result('rstack',' rstack',
+       '''
+       grey title="Raw Stack"
+       ''')
+
+```
+<img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/raw_stack.png">
+
 
 
 ### First break mute
