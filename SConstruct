@@ -95,6 +95,20 @@ Result('lines',
        ''')
 
 # ##############################
+#  Raw Stack
+# ##############################
+Flow('rcmps','lines',
+     '''
+     shot2cmp half=n |
+     put o2=-1.75 d2=0.05 label2="Half-offset"
+     ''')
+Flow('rstack','rcmps','stack')
+Result('rstack',' rstack',
+       '''
+       grey title="Raw Stack"
+       ''')
+
+# ##############################
 #  First break mute
 # ##############################
 
@@ -520,6 +534,6 @@ Result('vmig',
        ''')
 
 # Slice through the ensemble of migrations
-Flow('slice','migt vmig','slice pick=${SOURCES[1]}')
+Flow('slice','migt vel','slice pick=${SOURCES[1]}')
 Result('mig','slice',
-      'grey title="Stolt Migration with Variable Velocity" ')
+      ' agc rect1=50 rect2=20 | grey boundary=y color=seismic title="Stolt Migration with Variable Velocity" ')
