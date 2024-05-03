@@ -229,7 +229,7 @@ Result('rstack',' rstack',
 
 For simplicity, we extracted shot 100 for initial analysis and for decing the parameters before applying it to complete data.
 
-**`sfwindow`** to seperate shot 100 and **`sfmutter`** to mute the background noise
+**`sfwindow`** to separate shot 100 and **`sfmutter`** to mute the background noise
 
 ```Shell
 # Seperate shot 100
