@@ -202,7 +202,6 @@ Result('lines',
        ''')
 
 ```
-
 ![Alt Text](https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/Presentation4.gif)
 
 
