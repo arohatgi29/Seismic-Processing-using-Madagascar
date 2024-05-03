@@ -291,7 +291,7 @@ Result('fks','fk',
 ```
 <img src="https://github.com/arohatgi29/Seismic-Processing-using-Madagascar/blob/main/Images/fk_spectra.png">
 
-In this case, just by looking the spectra it is difficult to tell which part is noise and which part is signal. Energy at the centre part of the spectra looks denser, which is beleived to be ground roll. We muted that region.-
+In this case, just by looking the spectra it is difficult to tell which part is noise and which part is signal. Energy at the center part of the spectra looks denser, which is believed to be ground roll. We muted that region.-
 ```Shell
 
 Flow('rmutter','fk','real | mutter slope0=3 ')
